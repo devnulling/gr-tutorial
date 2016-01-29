@@ -81,10 +81,31 @@ set(GR_PKG_LIBEXEC_DIR  ${GR_LIBEXEC_DIR}/${CMAKE_PROJECT_NAME})
 set(GRC_BLOCKS_DIR      ${GR_PKG_DATA_DIR}/grc/blocks)
 
 ########################################################################
+# On Apple only, set install name and use rpath correctly, if not already set
+########################################################################
+if(APPLE)
+   if(NOT CMAKE_INSTALL_NAME_DIR)
+       set(CMAKE_INSTALL_NAME_DIR
+           ${CMAKE_INSTALL_PREFIX}/${GR_LIBRARY_DIR} CACHE
+           PATH "Library Install Name Destination Directory" FORCE)
+   endif(NOT CMAKE_INSTALL_NAME_DIR)
+   if(NOT CMAKE_INSTALL_RPATH)
+       set(CMAKE_INSTALL_RPATH
+           ${CMAKE_INSTALL_PREFIX}/${GR_LIBRARY_DIR} CACHE
+           PATH "Library Install RPath" FORCE)
+   endif(NOT CMAKE_INSTALL_RPATH)
+   if(NOT CMAKE_BUILD_WITH_INSTALL_RPATH)
+       set(CMAKE_BUILD_WITH_INSTALL_RPATH ON CACHE
+           BOOL "Do Build Using Library Install RPath" FORCE)
+   endif(NOT CMAKE_BUILD_WITH_INSTALL_RPATH)
+endif(APPLE)
+
+########################################################################
 # Find gnuradio build dependencies
 ########################################################################
 find_package(CppUnit)
 find_package(Doxygen)
+find_package(Log4cpp)
 
 # Search for GNU Radio and its components and versions. Add any
 # components required to the list of GR_REQUIRED_COMPONENTS (in all
@@ -116,12 +137,14 @@ include_directories(
     ${CMAKE_BINARY_DIR}/include
     ${Boost_INCLUDE_DIRS}
     ${CPPUNIT_INCLUDE_DIRS}
+    ${LOG4CPP_INCLUDE_DIRS}
     ${GNURADIO_ALL_INCLUDE_DIRS}
 )
 
 link_directories(
     ${Boost_LIBRARY_DIRS}
     ${CPPUNIT_LIBRARY_DIRS}
+    ${LOG4CPP_LIBRARY_DIRS}
     ${GNURADIO_RUNTIME_LIBRARY_DIRS}
 )
 
@@ -158,6 +181,10 @@ add_subdirectory(examples)
 ########################################################################
 # Install cmake search helper for this library
 ########################################################################
+if(NOT CMAKE_MODULES_DIR)
+  set(CMAKE_MODULES_DIR lib${LIB_SUFFIX}/cmake)
+endif(NOT CMAKE_MODULES_DIR)
+
 install(FILES cmake/Modules/tutorialConfig.cmake
-    DESTINATION lib/cmake/tutorial
+    DESTINATION ${CMAKE_MODULES_DIR}/gnuradio/tutorial
 )

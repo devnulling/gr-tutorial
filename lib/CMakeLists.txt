@@ -37,7 +37,7 @@ if(NOT tutorial_sources)
 endif(NOT tutorial_sources)
 
 add_library(gnuradio-tutorial SHARED ${tutorial_sources})
-target_link_libraries(gnuradio-tutorial ${Boost_LIBRARIES} ${GNURADIO_ALL_LIBRARIES})
+target_link_libraries(gnuradio-tutorial ${Boost_LIBRARIES} ${LOG4CPP_LIBRARIES} ${GNURADIO_ALL_LIBRARIES})
 set_target_properties(gnuradio-tutorial PROPERTIES DEFINE_SYMBOL "gnuradio_tutorial_EXPORTS")
 
 if(APPLE)
